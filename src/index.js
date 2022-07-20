@@ -1,4 +1,5 @@
 const { chromium } = require('playwright');
+const { exec } = require("child_process");
 const notifier = require('node-notifier');
 
 const NL_PERMIT_SCHEDULE_URL = 'https://oap.ind.nl/oap/en/#/doc';
@@ -15,7 +16,9 @@ const TIME_OPTIONS = {
   FIRST: '1: Object'
 };
 
-const CHECKING_TIMEOUT = 3000;
+function randomInteger(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
 const timeFormatter = new Intl.DateTimeFormat(
   'en-us',
@@ -26,13 +29,16 @@ const log = message => {
   console.log(`[${timeFormatter.format(new Date())}]: ${message}`);
 };
 
-const notify =() =>
+const notify =() => {
+  // set up telegram-send if you have a TG bot to recieve notifications through it
+  //exec('telegram-send "FOUND IND SLOT !!!!!"')
   notifier.notify({
     title: 'NL Permit appointment available!',
     message: 'Could you please to go to the bot Chromium instance and the filling form',
     sound: true,
     wait: true
   });
+}
 
 const selectDesk = async (page, desk) => {
   await page.selectOption('#desk', desk);
@@ -46,7 +52,7 @@ const tryToFindAvailableDate = async page => {
   try {
     // select date
     const locator = page.locator(
-      'available-date-picker tbody tr:nth-child(-n+3) button.btn-sm.available'
+      'available-date-picker tbody tr button.btn-sm.available'
     ).first();
     await locator.waitFor({ timeout: 500 });
     await locator.click();
@@ -61,8 +67,9 @@ const tryToFindAvailableDate = async page => {
 
     notify();
   } catch (e) {
-    log('Not available dates');
-    setTimeout(() => check(page), CHECKING_TIMEOUT);
+    let delay = randomInteger(2000, 5000);
+    log('Not available dates, next check in ' + delay + " ms");
+    setTimeout(() => check(page), delay);
   }
 }
 
@@ -75,8 +82,9 @@ const check = async page => {
 
   await selectDesk(page, DESK_VALUES.AMSTERDAM);
 
-  // await incrementMonth(page);
-  await incrementMonth(page);
+  // uncomment to look for slots next month
+  //await incrementMonth(page);
+  //await incrementMonth(page);
 
   await tryToFindAvailableDate(page);
 };
