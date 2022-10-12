@@ -85,11 +85,17 @@ const tryToFindAvailableDate = async page => {
  * @param {import('playwright').Page} page
  */
 const check = async page => {
+  let retries = 30;
   while (true) {
     try {
       await page.goto(NL_PERMIT_SCHEDULE_URL);
       break
     } catch (error) {
+      retries--;
+      if(retries < 0){
+        console.log("too many retries, exiting");
+        throw error;
+      }
       console.log(`caught ${error}, retrying`)
     }
   }
