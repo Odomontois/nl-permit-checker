@@ -17,7 +17,7 @@ const TIME_OPTIONS = {
 };
 
 function randomInteger(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 const timeFormatter = new Intl.DateTimeFormat(
@@ -29,7 +29,7 @@ const log = message => {
   console.log(`[${timeFormatter.format(new Date())}]: ${message}`);
 };
 
-const notify =() => {
+const notify = () => {
   // set up telegram-send if you have a TG bot to recieve notifications through it
   //exec('telegram-send "FOUND IND SLOT !!!!!"')
   notifier.notify({
@@ -85,7 +85,15 @@ const tryToFindAvailableDate = async page => {
  * @param {import('playwright').Page} page
  */
 const check = async page => {
-  await page.goto(NL_PERMIT_SCHEDULE_URL);
+  while (true) {
+    try {
+      await page.goto(NL_PERMIT_SCHEDULE_URL);
+      break
+    } catch (error) {
+      console.log(`caught ${error}, retrying`)
+    }
+  }
+
   log('Page reloaded');
 
   await selectDesk(page, DESK_VALUES.AMSTERDAM);
@@ -109,7 +117,7 @@ const runChecker = (page) => new Promise(() => {
 
 const run = async () => {
   console.log(
-`
+    `
 
 !!! Be ready to filling the appointment form  !!!
 Could you please prepare:
