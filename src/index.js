@@ -48,6 +48,14 @@ const incrementMonth = async page => {
   await page.locator('available-date-picker button.pull-right').click();
 };
 
+/**
+ * 
+ * @param {import('playwright').Page} page 
+ */
+const incrementPeople = async page => {
+  await page.locator('oap-form-number div.number-up').click();
+}
+
 const tryToFindAvailableDate = async page => {
   try {
     // select date
@@ -82,13 +90,19 @@ const check = async page => {
 
   await selectDesk(page, DESK_VALUES.AMSTERDAM);
 
+  await incrementPeople(page);
+
   // uncomment to look for slots next month
   //await incrementMonth(page);
   //await incrementMonth(page);
 
   await tryToFindAvailableDate(page);
 };
-
+/**
+ * 
+ * @param {chromium.Page} page 
+ * @returns 
+ */
 const runChecker = (page) => new Promise(() => {
   check(page);
 });
