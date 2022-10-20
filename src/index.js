@@ -92,7 +92,7 @@ const check = async page => {
       break
     } catch (error) {
       retries--;
-      if(retries < 0){
+      if (retries < 0) {
         console.log("too many retries, exiting");
         throw error;
       }
@@ -106,9 +106,9 @@ const check = async page => {
 
   await incrementPeople(page);
 
-  // uncomment to look for slots next month
-  //await incrementMonth(page);
-  //await incrementMonth(page);
+  if (process.argv[2] == 'NOV') {
+    await incrementMonth(page);
+  }
 
   await tryToFindAvailableDate(page);
 };
